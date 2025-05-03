@@ -1,5 +1,6 @@
-import { Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import ProductProvider from "./contexts/ProductContext";
 import PrivateRoute from "./components/PrivateRoute";
 
 import Home from "./pages/Home";
@@ -13,33 +14,37 @@ import Footer from "./components/Footer";
 
 function App() {
 	return (
-		<AuthProvider>
-			<div className="flex flex-col min-h-screen">
-				<Header />
-				<div className="flex flex-1">
-					<Sidebar />
-					<main className="flex-1">
-						<Routes>
-							{/* Public routes */}
-							<Route path="/" element={<Home />} />
-							<Route path="/signup" element={<Signup />} />
-							<Route path="/login" element={<Login />} />
+		<BrowserRouter>
+			<AuthProvider>
+				<ProductProvider>
+					<div className="flex flex-col min-h-screen">
+						<Header />
+						<div className="flex flex-1">
+							<Sidebar />
+							<main className="flex-1">
+								<Routes>
+									{/* Public routes */}
+									<Route path="/" element={<Home />} />
+									<Route path="/signup" element={<Signup />} />
+									<Route path="/login" element={<Login />} />
 
-							{/* Protected routes */}
-							<Route
-								path="/profile"
-								element={
-									<PrivateRoute>
-										<Profile />
-									</PrivateRoute>
-								}
-							/>
-						</Routes>
-					</main>
-				</div>
-				<Footer />
-			</div>
-		</AuthProvider>
+									{/* Protected routes */}
+									<Route
+										path="/profile"
+										element={
+											<PrivateRoute>
+												<Profile />
+											</PrivateRoute>
+										}
+									/>
+								</Routes>
+							</main>
+						</div>
+						<Footer />
+					</div>
+				</ProductProvider>
+			</AuthProvider>
+		</BrowserRouter>
 	);
 }
 

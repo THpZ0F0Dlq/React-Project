@@ -1,51 +1,41 @@
-import React, { useContext } from "react";
-import { Link } from "react-router";
-
-import { BsPlus, BsEyeFill } from "react-icons/bs";
-
-import { CartContext } from "../contexts/CartContext.jsx";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const Product = ({ product }) => {
-	const { addToCart } = useContext(CartContext);
-	const { id, image, category, title, price } = product;
+	const { addToCart } = useCart();
+	const { convertPrice, getCurrencySymbol } = useCurrency();
 
 	return (
-		<div>
-			<div className="border border-[#e4e4e4] h-[300px] mb-4 relative overflow-hidden group transition rounded-xl">
-				<div className="w-full h-full flex justify-center items-center">
-					{/* image */}
-					<div className="w-[200px] mx-auto flex justify-center items-center">
-						<img
-							className="max-h-[160px] group-hover:scale-110 transition duration-300"
-							src={image}
-							alt=""
-						/>
-					</div>
-				</div>
-				{/* buttons */}
-				<div className="absolute top-6 -right-11 group-hover:right-5 p-2 flex flex-col justify-center items-center gap-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-					<button onClick={() => addToCart(product, id)}>
-						<div className="flex justify-center items-center text-white w-12 h-12 bg-cyan-500 cursor-pointer">
-							<BsPlus className="text-3xl" />
-						</div>
-					</button>
-					<Link
-						to={`/product/${id}`}
-						className="w-12 h-12 bg-white flex justify-center items-center text-primary drop-shadow-xl"
-					>
-						<BsEyeFill />
-					</Link>
-				</div>
+		<div className="group relative">
+			<div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+				<img
+					src={product.image}
+					alt={product.title}
+					className="w-full h-full object-center object-cover lg:w-full lg:h-full"
+				/>
 			</div>
-			{/* category, title & price */}
-			<div>
-				<div className="tex-sm capitalize text-gray-500 mb-1">{category}</div>
-				<Link to={`/product/${id}`}>
-					<h2 className="font-semibold mb-1">{title}</h2>
-				</Link>
-
-				<h2 className="font-semibbold">$ {price}</h2>
+			<div className="mt-4 flex justify-between">
+				<div>
+					<h3 className="text-sm text-gray-700">
+						<Link to={`/product/${product.id}`}>
+							<span aria-hidden="true" className="absolute inset-0" />
+							{product.title}
+						</Link>
+					</h3>
+					<p className="mt-1 text-sm text-gray-500">{product.category}</p>
+				</div>
+				<p className="text-sm font-medium text-gray-900">
+					{getCurrencySymbol()}{convertPrice(product.price)}
+				</p>
 			</div>
+			<button
+				onClick={() => addToCart(product)}
+				className="mt-2 w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800"
+			>
+				Add to Cart
+			</button>
 		</div>
 	);
 };
