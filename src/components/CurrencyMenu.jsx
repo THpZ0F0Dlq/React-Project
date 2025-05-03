@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 const CurrencyMenu = () => {
   const { currency, setCurrency, availableCurrencies, getCurrencySymbol } = useCurrency();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleCurrencySelect = (curr) => {
+    setCurrency(curr);
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative" data-testid="currency-menu">
@@ -10,11 +20,13 @@ const CurrencyMenu = () => {
         className="flex items-center space-x-1 text-gray-700 hover:text-gray-900"
         data-testid="currency-button"
         aria-label="Select currency"
+        onClick={toggleDropdown}
+        aria-expanded={isOpen}
       >
         <span>{getCurrencySymbol()}</span>
         <span>{currency}</span>
         <svg
-          className="w-4 h-4"
+          className={`w-4 h-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -28,28 +40,30 @@ const CurrencyMenu = () => {
           />
         </svg>
       </button>
-      <div
-        className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
-        data-testid="currency-dropdown"
-      >
-        {availableCurrencies.map((curr) => (
-          <button
-            key={curr}
-            className={`block w-full text-left px-4 py-2 text-sm ${
-              currency === curr
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => setCurrency(curr)}
-            data-testid={`currency-option-${curr}`}
-            aria-label={`Select ${curr} currency`}
-          >
-            {curr}
-          </button>
-        ))}
-      </div>
+      {isOpen && (
+        <div
+          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
+          data-testid="currency-dropdown"
+        >
+          {availableCurrencies.map((curr) => (
+            <button
+              key={curr}
+              className={`block w-full text-left px-4 py-2 text-sm ${
+                currency === curr
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => handleCurrencySelect(curr)}
+              data-testid={`currency-option-${curr}`}
+              aria-label={`Select ${curr} currency`}
+            >
+              {curr}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default CurrencyMenu; 
+export default CurrencyMenu;

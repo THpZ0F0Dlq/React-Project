@@ -14,7 +14,7 @@ export const CartProvider = ({ children }) => {
 
 	useEffect(() => {
 		const total = cart.reduce((accumulator, currentItem) => {
-			return accumulator + currentItem.price;
+			return accumulator + (currentItem.price * currentItem.quantity);
 		}, 0);
 		setTotal(total);
 	}, [cart]);
@@ -49,7 +49,7 @@ export const CartProvider = ({ children }) => {
 		setCart(prevCart => prevCart.filter(item => item.id !== productId));
 	};
 
-	// cleart cart
+	// clear cart
 	const clearCart = () => {
 		setCart([]);
 	};

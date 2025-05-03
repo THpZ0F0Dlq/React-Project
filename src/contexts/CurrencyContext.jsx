@@ -48,7 +48,13 @@ export const CurrencyProvider = ({ children }) => {
 	const setCurrencyWithValidation = (newCurrency) => {
 		if (exchangeRates[newCurrency]) {
 			setCurrency(newCurrency);
+			return true;
 		}
+		return false;
+	};
+
+	const getExchangeRate = (currencyCode) => {
+		return exchangeRates[currencyCode] || 1;
 	};
 
 	return (
@@ -58,7 +64,9 @@ export const CurrencyProvider = ({ children }) => {
 				setCurrency: setCurrencyWithValidation,
 				convertPrice,
 				getCurrencySymbol,
-				availableCurrencies: Object.keys(exchangeRates)
+				availableCurrencies: Object.keys(exchangeRates),
+				getExchangeRate,
+				exchangeRates
 			}}
 		>
 			{children}
