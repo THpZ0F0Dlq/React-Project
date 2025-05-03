@@ -1,8 +1,10 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-export const CartContext = createContext();
+const CartContext = createContext();
 
-const CartProvider = ({ children }) => {
+export const useCart = () => useContext(CartContext);
+
+export const CartProvider = ({ children }) => {
 	// cart state
 	const [cart, setCart] = useState([]);
 	// item amount state
@@ -21,37 +23,30 @@ const CartProvider = ({ children }) => {
 	useEffect(() => {
 		if (cart) {
 			const amount = cart.reduce((accumulator, currentItem) => {
-				return accumulator + currentItem.amount;
+				return accumulator + currentItem.quantity;
 			}, 0);
 			setItemAmount(amount);
 		}
 	}, [cart]);
 
 	// add to cart
-	const addToCart = (product, id) => {
-		const newItem = { ...product, amount: 2 };
-		// check if the item is already in the cart
-		const cartItem = cart.find((item) => {
-			return item.id === id;
+	const addToCart = (product, quantity = 1) => {
+		setCart(prevCart => {
+			const existingItem = prevCart.find(item => item.id === product.id);
+			if (existingItem) {
+				return prevCart.map(item =>
+					item.id === product.id
+						? { ...item, quantity: item.quantity + quantity }
+						: item
+				);
+			}
+			return [...prevCart, { ...product, quantity }];
 		});
-		if (cartItem) {
-			const newCart = [...cart].map((item) => {
-				if (item.id === id) {
-					return { ...item, amount: cartItem.amount };
-				} else return item;
-			});
-			setCart(newCart);
-		} else {
-			setCart([...cart, newItem]);
-		}
 	};
 
 	// remove from cart
-	const removeFromCart = (id) => {
-		const newCart = cart.filter((item) => {
-			return item.id !== id;
-		});
-		setCart(newCart);
+	const removeFromCart = (productId) => {
+		setCart(prevCart => prevCart.filter(item => item.id !== productId));
 	};
 
 	// cleart cart
@@ -59,15 +54,30 @@ const CartProvider = ({ children }) => {
 		setCart([]);
 	};
 
-	// increase amount
-	const increaseAmount = (id) => {
-		const cartItem = cart.find((item) => item.id === id);
-		addToCart(cartItem, id);
+	// update quantity
+	const updateQuantity = (productId, quantity) => {
+		if (quantity < 0) {
+			return;
+		}
+		if (quantity === 0) {
+			removeFromCart(productId);
+			return;
+		}
+		setCart(prevCart =>
+			prevCart.map(item =>
+				item.id === productId ? { ...item, quantity } : item
+			)
+		);
 	};
 
-	// decrease amount
-	const decreaseAmount = (id) => {
-		const cartItem = cart.find((item) => item.id === id);
+	// calculate total
+	const calculateTotal = () => {
+		return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+	};
+
+	// get cart item count
+	const getCartItemCount = () => {
+		return cart.reduce((total, item) => total + item.quantity, 0);
 	};
 
 	return (
@@ -77,8 +87,9 @@ const CartProvider = ({ children }) => {
 				addToCart,
 				removeFromCart,
 				clearCart,
-				increaseAmount,
-				decreaseAmount,
+				updateQuantity,
+				calculateTotal,
+				getCartItemCount,
 				itemAmount,
 				total,
 			}}

@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { CartContext } from "../contexts/CartContext.jsx";
 import { CurrencyContext } from "../contexts/CurrencyContext.jsx";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/img/logo.svg";
 import { BsBag } from "react-icons/bs";
 import { CiUser } from "react-icons/ci";
 import { useAuth } from "../contexts/AuthContext"; // Import the auth context
+import { useSidebar } from '../contexts/SidebarContext';
 
 const Header = () => {
 	// header state
@@ -13,9 +14,8 @@ const Header = () => {
 	const { itemAmount } = useContext(CartContext);
 	const { currentUser, logout } = useAuth(); // Add authentication context
 	const navigate = useNavigate(); // Add navigation hook
-
-	// currency state
-	const { currency } = useContext(CurrencyContext);
+	const { currency, setCurrency, availableCurrencies } = useContext(CurrencyContext);
+	const { openSidebar } = useSidebar();
 
 	// event listener
 	useEffect(() => {
@@ -46,6 +46,15 @@ const Header = () => {
 		}
 	};
 
+	const [searchQuery, setSearchQuery] = useState('');
+	const { getCartItemCount } = useContext(CartContext);
+
+	const handleSearch = (e) => {
+		e.preventDefault();
+		// Implement search functionality
+		console.log('Searching for:', searchQuery);
+	};
+
 	return (
 		<header
 			className={`${
@@ -64,25 +73,27 @@ const Header = () => {
 					{/* currency select */}
 					<select
 						value={currency}
-						onChange={() => {}}
+						onChange={(e) => setCurrency(e.target.value)}
 						className="border border-slate-800 rounded-md px-3 py-2 focus:outline-none text-slate-800 text-sm"
 						aria-label="Select currency"
 					>
-						<option value="USD">🇺🇸 USD</option>
-						<option value="EUR">🇪🇺 EUR</option>
-						<option value="GBP">🇬🇧 GBP</option>
+						{availableCurrencies.map((curr) => (
+							<option key={curr} value={curr}>
+								{curr}
+							</option>
+						))}
 					</select>
 
 					{/* cart */}
 					<div
-						onClick={() => {}}
+						onClick={openSidebar}
 						className="cart-btn cursor-pointer flex relative"
 						role="button"
 						aria-label="cart"
 					>
 						<BsBag className="text-2xl" />
 						<div className="bg-slate-800 absolute -right-2 -bottom-2 text-[12px] w-[18px] h-[18px] text-white rounded-full flex justify-center items-center">
-							{itemAmount}
+							{getCartItemCount()}
 						</div>
 					</div>
 
