@@ -2,7 +2,7 @@ import React from "react";
 
 const CategoryFilter = ({ categories, activeCategory, onSelectCategory }) => {
 	return (
-		<div className="flex flex-wrap justify-center gap-3 mb-8">
+		<div className="flex flex-wrap justify-center gap-3 mb-8" data-testid="category-filter">
 			<button
 				role="button"
 				aria-label="Filter by all products"
@@ -12,6 +12,7 @@ const CategoryFilter = ({ categories, activeCategory, onSelectCategory }) => {
 						: "bg-gray-200 text-gray-800 hover:bg-gray-300"
 				}`}
 				onClick={() => onSelectCategory("all")}
+				data-testid="category-all"
 			>
 				All Products
 			</button>
@@ -27,6 +28,7 @@ const CategoryFilter = ({ categories, activeCategory, onSelectCategory }) => {
 							: "bg-gray-200 text-gray-800 hover:bg-gray-300"
 					}`}
 					onClick={() => onSelectCategory(category)}
+					data-testid={`category-${category}`}
 				>
 					{category.charAt(0).toUpperCase() + category.slice(1)}
 				</button>

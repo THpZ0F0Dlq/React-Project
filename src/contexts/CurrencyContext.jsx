@@ -1,39 +1,74 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
-export const CURRENCY_SYMBOLS = {
-	USD: "$",
-	EUR: "€",
-	GBP: "£",
+const CurrencyContext = createContext();
+
+export const useCurrency = () => useContext(CurrencyContext);
+
+const exchangeRates = {
+	USD: 1.0000,
+	EUR: 0.9234,
+	GBP: 0.7912,
+	LKR: 323.50,
+	JPY: 151.50,
+	AUD: 1.5200,
+	CAD: 1.3600,
+	CHF: 0.9000,
+	CNY: 7.2400,
+	INR: 83.3000
 };
 
-export const EXCHANGE_RATES = {
-	USD: 1,
-	EUR: 0.87891,
-	GBP: 0.74841,
-};
+export const CurrencyProvider = ({ children }) => {
+	const [currency, setCurrency] = useState('USD');
 
-export const CurrencyContext = createContext();
-
-const CurrencyProvider = ({ children }) => {
-	const [currency, setCurrency] = useState("USD");
-	const [currencySymbol, setCurrencySymbol] = useState(
-		CURRENCY_SYMBOLS[currency]
-	);
-
-	useEffect(() => {
-		const savedCurrency = localStorage.getItem("currency");
-		if (savedCurrency) {
-			setCurrency(savedCurrency);
+	const convertPrice = (price) => {
+		if (typeof price !== 'number' || isNaN(price)) {
+			return '0.00';
 		}
-	}, []);
+		const rate = exchangeRates[currency] || 1;
+		const converted = price * rate;
+		return converted.toFixed(2);
+	};
 
-	useEffect(() => {
-		localStorage.setItem("currency", currency);
-		setCurrencySymbol(CURRENCY_SYMBOLS[currency]);
-	}, [currency]);
+	const getCurrencySymbol = () => {
+		const symbols = {
+			USD: '$',
+			EUR: '€',
+			GBP: '£',
+			LKR: 'රු',
+			JPY: '¥',
+			AUD: 'A$',
+			CAD: 'C$',
+			CHF: 'Fr',
+			CNY: '¥',
+			INR: '₹'
+		};
+		return symbols[currency] || '$';
+	};
+
+	const setCurrencyWithValidation = (newCurrency) => {
+		if (exchangeRates[newCurrency]) {
+			setCurrency(newCurrency);
+			return true;
+		}
+		return false;
+	};
+
+	const getExchangeRate = (currencyCode) => {
+		return exchangeRates[currencyCode] || 1;
+	};
 
 	return (
-		<CurrencyContext.Provider value={{ currency, setCurrency, currencySymbol }}>
+		<CurrencyContext.Provider
+			value={{
+				currency,
+				setCurrency: setCurrencyWithValidation,
+				convertPrice,
+				getCurrencySymbol,
+				availableCurrencies: Object.keys(exchangeRates),
+				getExchangeRate,
+				exchangeRates
+			}}
+		>
 			{children}
 		</CurrencyContext.Provider>
 	);
