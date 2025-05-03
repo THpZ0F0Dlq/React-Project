@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
       }
     });
 
-    return () => {};
+    return unsubscribe;
   }, []);
 
   const value = {
