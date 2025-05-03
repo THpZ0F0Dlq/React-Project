@@ -5,24 +5,28 @@ const CurrencyContext = createContext();
 export const useCurrency = () => useContext(CurrencyContext);
 
 const exchangeRates = {
-	USD: 1,
-	EUR: 0.92,
-	GBP: 0.79,
+	USD: 1.0000,
+	EUR: 0.9234,
+	GBP: 0.7912,
 	LKR: 323.50,
 	JPY: 151.50,
-	AUD: 1.52,
-	CAD: 1.36,
-	CHF: 0.90,
-	CNY: 7.24,
-	INR: 83.30
+	AUD: 1.5200,
+	CAD: 1.3600,
+	CHF: 0.9000,
+	CNY: 7.2400,
+	INR: 83.3000
 };
 
 export const CurrencyProvider = ({ children }) => {
 	const [currency, setCurrency] = useState('USD');
 
 	const convertPrice = (price) => {
-		const rate = exchangeRates[currency];
-		return (price * rate).toFixed(2);
+		if (typeof price !== 'number' || isNaN(price)) {
+			return '0.00';
+		}
+		const rate = exchangeRates[currency] || 1;
+		const converted = price * rate;
+		return converted.toFixed(2);
 	};
 
 	const getCurrencySymbol = () => {
@@ -30,7 +34,7 @@ export const CurrencyProvider = ({ children }) => {
 			USD: '$',
 			EUR: '€',
 			GBP: '£',
-			LKR: 'Rs',
+			LKR: 'රු',
 			JPY: '¥',
 			AUD: 'A$',
 			CAD: 'C$',
@@ -38,14 +42,20 @@ export const CurrencyProvider = ({ children }) => {
 			CNY: '¥',
 			INR: '₹'
 		};
-		return symbols[currency];
+		return symbols[currency] || '$';
+	};
+
+	const setCurrencyWithValidation = (newCurrency) => {
+		if (exchangeRates[newCurrency]) {
+			setCurrency(newCurrency);
+		}
 	};
 
 	return (
 		<CurrencyContext.Provider
 			value={{
 				currency,
-				setCurrency,
+				setCurrency: setCurrencyWithValidation,
 				convertPrice,
 				getCurrencySymbol,
 				availableCurrencies: Object.keys(exchangeRates)

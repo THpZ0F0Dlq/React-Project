@@ -1,10 +1,13 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useMemo } from "react";
 
 export const ProductContext = createContext();
 
 const ProductProvider = ({ children }) => {
   // products state
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
   // fetch products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,8 +22,34 @@ const ProductProvider = ({ children }) => {
     fetchProducts();
   }, []);
 
+  // Filter products based on search term and category
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, selectedCategory]);
+
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(products.map(product => product.category));
+    return ["all", ...uniqueCategories];
+  }, [products]);
+
+  const value = {
+    products: filteredProducts,
+    categories,
+    searchTerm,
+    setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    allProducts: products
+  };
+
   return (
-    <ProductContext.Provider value={{ products }}>
+    <ProductContext.Provider value={value}>
       {children}
     </ProductContext.Provider>
   );

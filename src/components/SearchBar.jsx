@@ -15,19 +15,21 @@ const SearchBar = ({ onSearch }) => {
 				<input
 					type="text"
 					placeholder="Search products..."
-					role="textbox"
-					aria-label="search"
+					role="searchbox"
+					aria-label="Search products"
 					value={searchTerm}
 					onChange={handleSearch}
 					className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none text-gray-800"
+					data-testid="search-input"
 				/>
-				<div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+				<div className="absolute right-3 top-1/2 transform -translate-y-1/2" data-testid="search-icon">
 					<svg
 						className="w-5 h-5 text-gray-400"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
 						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
 					>
 						<path
 							strokeLinecap="round"

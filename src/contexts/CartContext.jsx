@@ -56,7 +56,10 @@ export const CartProvider = ({ children }) => {
 
 	// update quantity
 	const updateQuantity = (productId, quantity) => {
-		if (quantity <= 0) {
+		if (quantity < 0) {
+			return;
+		}
+		if (quantity === 0) {
 			removeFromCart(productId);
 			return;
 		}
@@ -69,7 +72,7 @@ export const CartProvider = ({ children }) => {
 
 	// calculate total
 	const calculateTotal = () => {
-		return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+		return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 	};
 
 	// get cart item count

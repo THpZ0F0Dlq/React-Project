@@ -18,29 +18,48 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+    setError(null);
+    return createUserWithEmailAndPassword(auth, email, password)
+      .catch((error) => {
+        setError(error.message);
+        throw error;
+      });
   }
 
   function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+    setError(null);
+    return signInWithEmailAndPassword(auth, email, password)
+      .catch((error) => {
+        setError(error.message);
+        throw error;
+      });
   }
 
   function logout() {
-    return signOut(auth);
+    setError(null);
+    return signOut(auth)
+      .catch((error) => {
+        setError(error.message);
+        throw error;
+      });
   }
 
   function resetPassword(email) {
-    return sendPasswordResetEmail(auth, email);
+    setError(null);
+    return sendPasswordResetEmail(auth, email)
+      .catch((error) => {
+        setError(error.message);
+        throw error;
+      });
   }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      if (user) {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -52,6 +71,8 @@ export function AuthProvider({ children }) {
     login,
     logout,
     resetPassword,
+    error,
+    loading
   };
 
   return (
